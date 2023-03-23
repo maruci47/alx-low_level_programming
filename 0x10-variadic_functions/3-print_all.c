@@ -1,106 +1,51 @@
 #include "variadic_functions.h"
-#include <stdio.h>
-#include <stdarg.h>
-
-void print_char(va_list arg);
-void print_int(va_list arg);
-void print_float(va_list arg);
-void print_string(va_list arg);
-void print_all(const char * const format, ...);
 
 /**
- * print_char - Prints a char.
- * @arg: A list of arguments
- */
-void print_char(va_list arg)
-{
-	char names;
-
-	names = va_arg(arg, int);
-	printf("%c", names);
-}
-
-/**
- * print_int - Prints an int
- * @arg: A list of arguments
- */
-void print_int(va_list arg)
-{
-	int numbr;
-
-	numbr = va_arg(arg, int);
-	printf("%d", numbr);
-}
-
-/**
- * print_float - Prints a float
- * @arg: A list of arguments
- */
-void print_float(va_list arg)
-{
-	float numbr;
-
-	numbr = va_arg(arg, double);
-	printf("%f", numbr);
-}
-
-/**
- * print_string - Prints a string
- * @arg: A list of arguments
- */
-void print_string(va_list arg)
-{
-	char *string;
-
-	string = va_arg(arg, char *);
-
-	if (string == NULL)
-	{
-		printf("(nil)");
-		return;
-	}
-	printf("%s", string);
-}
-
-/**
- * print_all - Prints anything
- * @format: A string of characters
- * @...: A variable number of arguments
+ * print_all - prints anything.
+ * @format: a list of types of arguments passed to the function.
  *
- * Description: Any argument
+ * Return: no return.
  */
 void print_all(const char * const format, ...)
 {
-	va_list count;
-	int x = 0, y = 0;
-	char *sep = "";
-	printer_t funcs[] = {
-		{"c", print_char},
-		{"i", print_int},
-		{"f", print_float},
-		{"s", print_string}
-	};
+	va_list valist;
+	unsigned int i = 0, j, c = 0;
+	char *str;
+	const char t_arg[] = "cifs";
 
-	va_start(count, format);
-
-	while (format && (*(format + x)))
+	va_start(valist, format);
+	while (format && format[i])
 	{
-		y = 0;
-
-		while (y < 4 && (*(format + x) != *(funcs[y].symbol)))
-			y++;
-
-		if (y < 4)
+		j = 0;
+		while (t_arg[j])
 		{
-			printf("%s", sep);
-			funcs[y].print(count);
-			sep = ", ";
+			if (format[i] == t_arg[j] && c)
+			{
+				printf(", ");
+				break;
+			} j++;
 		}
-
-		x++;
+		switch (format[i])
+		{
+		case 'c':
+			printf("%c", va_arg(valist, int)), c = 1;
+			break;
+		case 'i':
+			printf("%d", va_arg(valist, int)), c = 1;
+			break;
+		case 'f':
+			printf("%f", va_arg(valist, double)), c = 1;
+			break;
+		case 's':
+			str = va_arg(valist, char *), c = 1;
+			if (!str)
+			{
+				printf("(nil)");
+				break;
+			}
+			printf("%s", str);
+			break;
+		} i++;
 	}
-
-	printf("\n");
-
-	va_end(count);
+	printf("\n"), va_end(valist);
 }
